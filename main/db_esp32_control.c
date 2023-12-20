@@ -39,7 +39,7 @@
 #define TRANS_RD_BYTES_NUM  8   // amount of bytes read form serial port at once when transparent is selected
 #define UDP_BUF_SIZE    2048
 #define UART_BUF_SIZE   (1024)
-#define MAX_UDP_CLIENTS 8
+#define MAX_UDP_CLIENTS 1
 
 struct db_udp_connection_t {
     int udp_socket;
@@ -372,6 +372,8 @@ _Noreturn void control_module_tcp() {
                 break;
         }
     }
+    //added by jw : close sockets
+
     vTaskDelete(NULL);
 }
 
