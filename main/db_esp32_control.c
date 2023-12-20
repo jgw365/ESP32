@@ -114,7 +114,8 @@ int open_udp_socket() {
  * @param data_length
  */
 void send_to_all_clients(int tcp_clients[], struct db_udp_connection_t *udp_conn, uint8_t data[], uint data_length) {
-    send_to_all_tcp_clients(tcp_clients, data, data_length);
+    //jw
+    //send_to_all_tcp_clients(tcp_clients, data, data_length);
     for (int i = 0; i < MAX_UDP_CLIENTS; i++) {  // send to all UDP clients
         if (udp_conn->udp_clients[i].sin_len > 0) {
             int sent = sendto(udp_conn->udp_socket, data, data_length, 0, (struct sockaddr *) &udp_conn->udp_clients[i],
@@ -123,6 +124,7 @@ void send_to_all_clients(int tcp_clients[], struct db_udp_connection_t *udp_conn
                 ESP_LOGE(TAG, "UDP - Error sending (%i/%i) because of %d", sent, data_length, errno);
                 udp_conn->udp_clients[i].sin_len = 0;
             }
+        printf("once");
         }
     }
 }
