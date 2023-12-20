@@ -39,7 +39,7 @@
 #define TRANS_RD_BYTES_NUM  8   // amount of bytes read form serial port at once when transparent is selected
 #define UDP_BUF_SIZE    2048
 #define UART_BUF_SIZE   (1024)
-#define MAX_UDP_CLIENTS 1
+#define MAX_UDP_CLIENTS 5
 
 struct db_udp_connection_t {
     int udp_socket;
@@ -361,7 +361,7 @@ _Noreturn void control_module_tcp() {
             write_to_uart(udp_buffer, recv_length);
             add_udp_to_known_clients(&udp_conn, udp_source_addr, false);
         }
-        update_udp_broadcast(&last_udp_brdc_update, &udp_conn, &wifi_mode);
+        //update_udp_broadcast(&last_udp_brdc_update, &udp_conn, &wifi_mode);
         switch (SERIAL_PROTOCOL) {
             case 1:
             case 2:
