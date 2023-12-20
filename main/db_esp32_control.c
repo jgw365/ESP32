@@ -124,7 +124,7 @@ void send_to_all_clients(int tcp_clients[], struct db_udp_connection_t *udp_conn
                 ESP_LOGE(TAG, "UDP - Error sending (%i/%i) because of %d", sent, data_length, errno);
                 udp_conn->udp_clients[i].sin_len = 0;
             }
-        printf("once");
+        printf("jw:%d\n",udp_conn->udp_socket);
         }
     }
 }
