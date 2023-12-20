@@ -115,11 +115,11 @@ int open_udp_socket() {
  */
 void send_to_all_clients(int tcp_clients[], struct db_udp_connection_t *udp_conn, uint8_t data[], uint data_length) {
     //jw
-    //send_to_all_tcp_clients(tcp_clients, data, data_length);
+    send_to_all_tcp_clients(tcp_clients, data, data_length);
     for (int i = 0; i < MAX_UDP_CLIENTS; i++) {  // send to all UDP clients
         if (udp_conn->udp_clients[i].sin_len > 0) {
-            //int sent = sendto(udp_conn->udp_socket, data, data_length, 0, (struct sockaddr *) &udp_conn->udp_clients[i],
-            int sent = sendto(56, data, data_length, 0, (struct sockaddr *) &udp_conn->udp_clients[i],
+            int sent = sendto(udp_conn->udp_socket, data, data_length, 0, (struct sockaddr *) &udp_conn->udp_clients[i],
+            //int sent = sendto(56, data, data_length, 0, (struct sockaddr *) &udp_conn->udp_clients[i],
                               sizeof(udp_conn->udp_clients[i]));
             if (sent != data_length) {
                 ESP_LOGE(TAG, "UDP - Error sending (%i/%i) because of %d", sent, data_length, errno);
@@ -330,28 +330,28 @@ _Noreturn void control_module_tcp() {
 
     ESP_LOGI(TAG, "Started control module");
     while (1) {
-        // handle_tcp_master(tcp_master_socket, tcp_clients);
-        // for (int i = 0; i < CONFIG_LWIP_MAX_ACTIVE_TCP; i++) {  // handle TCP clients
-        //     if (tcp_clients[i] > 0) {
-        //         ssize_t recv_length = recv(tcp_clients[i], tcp_client_buffer, TCP_BUFF_SIZ, 0);
-        //         if (recv_length > 0) {
-        //             ESP_LOGD(TAG, "TCP: Received %i bytes", recv_length);
-        //             write_to_uart(tcp_client_buffer, recv_length);
-        //         } else if (recv_length == 0) {
-        //             shutdown(tcp_clients[i], 0);
-        //             close(tcp_clients[i]);
-        //             tcp_clients[i] = -1;
-        //             ESP_LOGI(TAG, "TCP client disconnected");
-        //             num_connected_tcp_clients--;
-        //         } else if (errno != EAGAIN && errno != EWOULDBLOCK) {
-        //             ESP_LOGE(TAG, "Error receiving from TCP client %i (fd: %i): %d", i, tcp_clients[i], errno);
-        //             shutdown(tcp_clients[i], 0);
-        //             close(tcp_clients[i]);
-        //             num_connected_tcp_clients--;
-        //             tcp_clients[i] = -1;
-        //         }
-        //     }
-        // }
+        handle_tcp_master(tcp_master_socket, tcp_clients);
+        for (int i = 0; i < CONFIG_LWIP_MAX_ACTIVE_TCP; i++) {  // handle TCP clients
+            if (tcp_clients[i] > 0) {
+                ssize_t recv_length = recv(tcp_clients[i], tcp_client_buffer, TCP_BUFF_SIZ, 0);
+                if (recv_length > 0) {
+                    ESP_LOGD(TAG, "TCP: Received %i bytes", recv_length);
+                    write_to_uart(tcp_client_buffer, recv_length);
+                } else if (recv_length == 0) {
+                    shutdown(tcp_clients[i], 0);
+                    close(tcp_clients[i]);
+                    tcp_clients[i] = -1;
+                    ESP_LOGI(TAG, "TCP client disconnected");
+                    num_connected_tcp_clients--;
+                } else if (errno != EAGAIN && errno != EWOULDBLOCK) {
+                    ESP_LOGE(TAG, "Error receiving from TCP client %i (fd: %i): %d", i, tcp_clients[i], errno);
+                    shutdown(tcp_clients[i], 0);
+                    close(tcp_clients[i]);
+                    num_connected_tcp_clients--;
+                    tcp_clients[i] = -1;
+                }
+            }
+        }
         // handle incoming UDP data - Read UDP and forward to flight controller
         // all devices that send us UDP data will be added to the list of MAVLink UDP receivers
         ssize_t recv_length = recvfrom(udp_conn.udp_socket, udp_buffer, UDP_BUF_SIZE, 0,
