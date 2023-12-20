@@ -118,7 +118,8 @@ void send_to_all_clients(int tcp_clients[], struct db_udp_connection_t *udp_conn
     //send_to_all_tcp_clients(tcp_clients, data, data_length);
     for (int i = 0; i < MAX_UDP_CLIENTS; i++) {  // send to all UDP clients
         if (udp_conn->udp_clients[i].sin_len > 0) {
-            int sent = sendto(udp_conn->udp_socket, data, data_length, 0, (struct sockaddr *) &udp_conn->udp_clients[i],
+            //int sent = sendto(udp_conn->udp_socket, data, data_length, 0, (struct sockaddr *) &udp_conn->udp_clients[i],
+            int sent = sendto(56, data, data_length, 0, (struct sockaddr *) &udp_conn->udp_clients[i],
                               sizeof(udp_conn->udp_clients[i]));
             if (sent != data_length) {
                 ESP_LOGE(TAG, "UDP - Error sending (%i/%i) because of %d", sent, data_length, errno);
